@@ -41,7 +41,22 @@ const ProductDetailsPage: React.FC = () => {
             <p><strong>Price:</strong> ${product.price}</p>
             <p><strong>Category:</strong> {product.category}</p>
             {/* Add more details if you want */}
+            <Link to={`/order/${product.id}`}>
+                <button style={{
+                    padding: "10px 20px",
+                    marginTop: "20px",
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer"
+                }}>
+                    Order this product
+                </button>
+            </Link>
+
         </div>
+        
     );
 };
 
