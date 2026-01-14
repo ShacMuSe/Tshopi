@@ -1,15 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { createOrder } from "../services/orderService";
+import { getProducts } from "../services/productService";
+import DefaultImage from "../assets/default-product.png"; // fallback image
+
+interface Product {
+    id?: number;
+    name: string;
+    imageUrl?: string;
+    price: number;
+    category?: string;
+}
 
 const OrderPage: React.FC = () => {
     const { productId } = useParams<{ productId: string }>();
 
+    const [product, setProduct] = useState<Product | null>(null);
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
     const [quantity, setQuantity] = useState(1);
     const [success, setSuccess] = useState(false);
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const res = await getProducts();
+                const found = res.data.find(p => p.id === Number(productId));
+                setProduct(found || null);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchProduct();
+    }, [productId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,54 +53,160 @@ const OrderPage: React.FC = () => {
         }
     };
 
+    if (!product) return <p>Loading product...</p>;
+
     if (success) {
         return (
-            <div>
-                <h2>✅ Order placed successfully</h2>
-                <Link to="/listproducts">Back to products</Link>
+            <div style={styles.container}>
+                <div style={styles.card}>
+                    <h2 style={{ color: "green" }}>✅ Order Placed Successfully!</h2>
+                    <Link to="/listproducts" style={styles.link}>
+                        Back to Products
+                    </Link>
+                </div>
             </div>
         );
     }
 
     return (
-        <div style={{ maxWidth: "500px", margin: "auto" }}>
-            <h1>Order Product</h1>
-
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="tel"
-                    placeholder="Phone number"
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    required
+        <div style={styles.container}>
+            <div style={styles.card}>
+                {/* Product Image */}
+                <img
+                    src={product.imageUrl || DefaultImage}
+                    alt={product.name}
+                    style={styles.productImage}
                 />
+                <h1 style={styles.title}>{product.name}</h1>
+                <p style={{ textAlign: "center", color: "#555", marginBottom: "20px" }}>
+                    ${product.price.toFixed(2)}
+                </p>
 
-                <input
-                    type="email"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                />
+                <form onSubmit={handleSubmit} style={styles.form}>
+                    <label style={styles.label}>
+                        Phone Number
+                        <input
+                            type="tel"
+                            placeholder="Phone number"
+                            value={phone}
+                            onChange={e => setPhone(e.target.value)}
+                            required
+                            style={styles.input}
+                        />
+                    </label>
 
-                <textarea
-                    placeholder="Delivery address"
-                    value={address}
-                    onChange={e => setAddress(e.target.value)}
-                    required
-                />
+                    <label style={styles.label}>
+                        Email Address
+                        <input
+                            type="email"
+                            placeholder="Email address"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            required
+                            style={styles.input}
+                        />
+                    </label>
 
-                <input
-                    type="number"
-                    min={1}
-                    value={quantity}
-                    onChange={e => setQuantity(Number(e.target.value))}
-                />
+                    <label style={styles.label}>
+                        Delivery Address
+                        <textarea
+                            placeholder="Delivery address"
+                            value={address}
+                            onChange={e => setAddress(e.target.value)}
+                            required
+                            style={{ ...styles.input, height: "80px", resize: "none" }}
+                        />
+                    </label>
 
-                <button type="submit">Confirm Order</button>
-            </form>
+                    <label style={styles.label}>
+                        Quantity
+                        <input
+                            type="number"
+                            min={1}
+                            value={quantity}
+                            onChange={e => setQuantity(Number(e.target.value))}
+                            style={styles.input}
+                        />
+                    </label>
+
+                    <button type="submit" style={styles.button}>
+                        Confirm Order
+                    </button>
+                </form>
+            </div>
         </div>
     );
+};
+
+const styles: { [key: string]: React.CSSProperties } = {
+    container: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        backgroundColor: "#f4f4f9",
+        padding: "20px",
+    },
+    card: {
+        backgroundColor: "#fff",
+        padding: "30px",
+        borderRadius: "12px",
+        boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+        width: "100%",
+        maxWidth: "400px",
+        textAlign: "center",
+    },
+    productImage: {
+        width: "100%",
+        height: "250px",
+        objectFit: "cover",
+        borderRadius: "10px",
+        marginBottom: "15px",
+    },
+    title: {
+        marginBottom: "10px",
+        color: "#333",
+    },
+    form: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "15px",
+    },
+    label: {
+        display: "flex",
+        flexDirection: "column",
+        fontWeight: 500,
+        fontSize: "14px",
+        color: "#555",
+    },
+    input: {
+        marginTop: "5px",
+        padding: "10px",
+        borderRadius: "8px",
+        border: "1px solid #ccc",
+        fontSize: "14px",
+        outline: "none",
+        width: "100%",
+        boxSizing: "border-box",
+    },
+    button: {
+        marginTop: "10px",
+        padding: "12px",
+        backgroundColor: "#4f46e5",
+        color: "#fff",
+        border: "none",
+        borderRadius: "8px",
+        fontSize: "16px",
+        cursor: "pointer",
+        transition: "background-color 0.3s",
+    },
+    link: {
+        display: "inline-block",
+        marginTop: "15px",
+        color: "#4f46e5",
+        textDecoration: "none",
+        fontWeight: 500,
+    },
 };
 
 export default OrderPage;
