@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 const ProductListingPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
 
-    // Load products from backend
     useEffect(() => {
         const loadProducts = async () => {
             try {
@@ -23,6 +22,7 @@ const ProductListingPage: React.FC = () => {
     return (
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
             <h1 style={{ marginBottom: "20px", textAlign: "center" }}>Products</h1>
+
             <div
                 style={{
                     display: "grid",
@@ -31,7 +31,11 @@ const ProductListingPage: React.FC = () => {
                 }}
             >
                 {products.map(p => (
-                    <Link to={`/product/${p.id}`} key={p.id} style={{ textDecoration: "none", color: "inherit" }}>
+                    <Link
+                        to={`/product/${p.id}`}
+                        key={p.id}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                    >
                         <div
                             style={{
                                 border: "1px solid #ddd",
@@ -43,7 +47,7 @@ const ProductListingPage: React.FC = () => {
                             }}
                         >
                             <img
-                                src={p.imageUrl || DefaultImage}
+                                src={p.imageUrls?.[0] || DefaultImage}
                                 alt={p.name}
                                 style={{
                                     width: "100%",
@@ -53,8 +57,13 @@ const ProductListingPage: React.FC = () => {
                                     marginBottom: "10px"
                                 }}
                             />
-                            <h3 style={{ fontSize: "1.1rem", marginBottom: "5px" }}>{p.name}</h3>
-                            <p style={{ fontWeight: "bold", color: "#333" }}>${p.price}</p>
+
+                            <h3 style={{ fontSize: "1.1rem", marginBottom: "5px" }}>
+                                {p.name}
+                            </h3>
+                            <p style={{ fontWeight: "bold", color: "#333" }}>
+                                ${p.price}
+                            </p>
                         </div>
                     </Link>
                 ))}
