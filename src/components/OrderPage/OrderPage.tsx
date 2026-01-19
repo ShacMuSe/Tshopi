@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { createOrder } from "../services/orderService";
-import { getProducts } from "../services/productService";
-import DefaultImage from "../assets/default-product.png"; // fallback image
+import { createOrder } from "../../services/orderService";
+import { getProducts } from "../../services/productService";
+import DefaultImage from "../../assets/default-product.png"; // fallback image
 
 interface Product {
     id?: number;
     name: string;
-    imageUrl?: string;
+    imageUrls?: string[];
     price: number;
     category?: string;
 }
@@ -15,6 +15,9 @@ interface Product {
 const OrderPage: React.FC = () => {
     const { productId } = useParams<{ productId: string }>();
 
+    const [selectedImage, setSelectedImage] = useState<string>("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [product, setProduct] = useState<Product | null>(null);
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
@@ -27,13 +30,22 @@ const OrderPage: React.FC = () => {
             try {
                 const res = await getProducts();
                 const found = res.data.find(p => p.id === Number(productId));
-                setProduct(found || null);
+
+                if (found) {
+                    setProduct(found);
+
+                    if (found.imageUrls && found.imageUrls.length > 0) {
+                        setSelectedImage(found.imageUrls[0]); // ✅ auto select
+                    }
+                }
             } catch (err) {
                 console.error(err);
             }
         };
+
         fetchProduct();
     }, [productId]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,10 +53,13 @@ const OrderPage: React.FC = () => {
         try {
             await createOrder({
                 productId: Number(productId),
+                firstName,
+                lastName,
                 phone,
                 email,
                 address,
-                quantity
+                quantity,
+                selectedImage,
             });
             setSuccess(true);
         } catch (err) {
@@ -73,16 +88,59 @@ const OrderPage: React.FC = () => {
             <div style={styles.card}>
                 {/* Product Image */}
                 <img
-                    src={product.imageUrl || DefaultImage}
+                    src={selectedImage || DefaultImage}
                     alt={product.name}
                     style={styles.productImage}
                 />
+                {/* Image / Color Selection */}
+                <div style={styles.thumbnailRow}>
+                    {product.imageUrls?.map((img, index) => (
+                        <img
+                            key={index}
+                            src={img}
+                            alt={`variant-${index}`}
+                            onClick={() => setSelectedImage(img)}
+                            style={{
+                                ...styles.thumbnail,
+                                border:
+                                    selectedImage === img
+                                        ? "2px solid #4f46e5"
+                                        : "1px solid #ccc",
+                            }}
+                        />
+                    ))}
+                </div>
                 <h1 style={styles.title}>{product.name}</h1>
                 <p style={{ textAlign: "center", color: "#555", marginBottom: "20px" }}>
                     ${product.price.toFixed(2)}
                 </p>
 
                 <form onSubmit={handleSubmit} style={styles.form}>
+
+                    <label style={styles.label}>
+                        First Name
+                        <input
+                            type="text"
+                            placeholder="First name"
+                            value={firstName}
+                            onChange={e => setFirstName(e.target.value)}
+                            required
+                            style={styles.input}
+                        />
+                    </label>
+
+                    <label style={styles.label}>
+                        Last Name
+                        <input
+                            type="text"
+                            placeholder="Last name"
+                            value={lastName}
+                            onChange={e => setLastName(e.target.value)}
+                            required
+                            style={styles.input}
+                        />
+                    </label>
+
                     <label style={styles.label}>
                         Phone Number
                         <input
@@ -132,13 +190,31 @@ const OrderPage: React.FC = () => {
                     <button type="submit" style={styles.button}>
                         Confirm Order
                     </button>
+
                 </form>
+
             </div>
         </div>
     );
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
+    thumbnailRow: {
+        display: "flex",
+        gap: "10px",
+        justifyContent: "center",
+        marginBottom: "15px",
+    },
+
+    thumbnail: {
+        width: "60px",
+        height: "60px",
+        objectFit: "cover",
+        borderRadius: "6px",
+        cursor: "pointer",
+        backgroundColor: "#f0f0f0",
+    },
+
     container: {
         display: "flex",
         justifyContent: "center",
@@ -159,7 +235,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     productImage: {
         width: "100%",
         height: "250px",
-        objectFit: "cover",
+        objectFit: "contain",
         borderRadius: "10px",
         marginBottom: "15px",
     },
@@ -178,6 +254,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         fontWeight: 500,
         fontSize: "14px",
         color: "#555",
+        textAlign: "left",
     },
     input: {
         marginTop: "5px",
@@ -207,6 +284,7 @@ const styles: { [key: string]: React.CSSProperties } = {
         textDecoration: "none",
         fontWeight: 500,
     },
+    
 };
 
 export default OrderPage;

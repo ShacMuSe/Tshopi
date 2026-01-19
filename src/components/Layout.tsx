@@ -1,13 +1,17 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "./NavBar";
+import Footer from "./Footer/Footer";
 
 const Layout: React.FC = () => {
     return (
-        <div>
+        <div className="app-layout" style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             <NavBar />
-            <div style={{ padding: "20px" }}>
-                <Outlet /> {/* This is where routed page content will appear */}
-            </div>
+
+            <main style={{ flex: 1, padding: "20px" }}>
+                <Outlet /> {/* Routed page content will appear here */}
+            </main>
+
+            <Footer /> {/* Footer appears on every page */}
         </div>
     );
 };

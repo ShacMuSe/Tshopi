@@ -10,8 +10,10 @@ const NavBar: React.FC = () => (
             backgroundColor: "#f8f8f8"
         }}
     >
-        <Link to="/listproducts">Product Listing</Link>
-        <Link to="/addproducts">Add Product</Link>
+        <Link to="/listproducts">All Products</Link>
+        <Link to="/products/hoodies">Hoodies</Link>
+        <Link to="/products/pants">Pants</Link>
+        <Link to="/products/shirts">Shirts</Link>
     </nav>
 );
 

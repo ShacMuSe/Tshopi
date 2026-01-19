@@ -1,22 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./components/Layout";
-import ProductListingPage from "./components/ProductListingPage";
-import ProductDetailsPage from "./components/ProductDetailsPage";
-import OrderPage from "./components/OrderPage";
+import App from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/listproducts" />} />
-          <Route path="listproducts" element={<ProductListingPage />} />
-          <Route path="product/:id" element={<ProductDetailsPage />} />
-          <Route path="/order/:productId" element={<OrderPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <App />
   </React.StrictMode>
 );
