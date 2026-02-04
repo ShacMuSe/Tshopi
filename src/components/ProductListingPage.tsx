@@ -15,7 +15,12 @@ const ProductListingPage: React.FC = () => {
                 const res = await getProducts();
                 let filteredProducts = res.data;
 
-                // Filter by category if category exists in URL
+               /* // ✅ Show only IN_STOCK products
+                filteredProducts = filteredProducts.filter(
+                    (p) => p.stockStatus === "IN_STOCK"
+                );*/
+
+                // ✅ Filter by category if category exists in URL
                 if (category) {
                     filteredProducts = filteredProducts.filter(
                         (p) => p.category.toLowerCase() === category.toLowerCase()
@@ -27,8 +32,10 @@ const ProductListingPage: React.FC = () => {
                 console.error("Error fetching products:", error);
             }
         };
+
         loadProducts();
     }, [category]);
+
 
     return (
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>

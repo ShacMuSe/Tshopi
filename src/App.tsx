@@ -1,10 +1,11 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
+import Layout from "./components/Layout/Layout";
 import ProductListingPage from "./components/ProductListingPage";
-import ProductDetailsPage from "./components/ProductDetailsPage";
+import ProductDetailsPage from "./components/ProductDetailsPage/ProductDetailsPage";
 import OrderPage from "./components/OrderPage/OrderPage";
 import CategoriesPage from "./components/HomePage/CategoriesPage";
+import CartPage from "./components/CartPage/CartPage";
 
 const App: React.FC = () => {
   return (
@@ -25,6 +26,9 @@ const App: React.FC = () => {
 
           {/* Order */}
           <Route path="order/:productId" element={<OrderPage />} />
+
+          {/* Cart */}
+          <Route path="/cart/:phone" element={<CartPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

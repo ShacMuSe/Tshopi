@@ -1,0 +1,112 @@
+/* Layout */
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+    background: rgba(248, 248, 248, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* Brand */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    text-decoration: none;
+    color: #111;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.brand__logo {
+    height: 38px;
+    width: 38px;
+    border-radius: 12px;
+    object-fit: cover;
+
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+.brand__name {
+    font-size: 16px;
+}
+
+/* Links container */
+.nav__links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+/* Link pill */
+.nav__link {
+    text-decoration: none;
+    color: #111;
+
+    font-weight: 650;
+    font-size: 14px;
+
+    padding: 9px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+
+    background: rgba(255, 255, 255, 0.7);
+
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+/* Hover / active feel */
+.nav__link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.nav__link:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Active route */
+.nav__link.is-active {
+    background: #111;
+    color: #fff;
+    border: 1px solid rgba(17, 17, 17, 0.25);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.nav__link.is-active:hover {
+    transform: none;
+}
+
+/* Small screens */
+@media (max-width: 520px) {
+    .brand__name {
+        display: none;
+        /* keep navbar clean on mobile */
+    }
+
+    .nav {
+        padding: 10px 12px;
+    }
+
+    .nav__link {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}

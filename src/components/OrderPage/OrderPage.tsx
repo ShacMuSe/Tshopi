@@ -2,14 +2,15 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { createOrder } from "../../services/orderService";
 import { getProducts } from "../../services/productService";
-import DefaultImage from "../../assets/default-product.png"; // fallback image
+import DefaultImage from "../../assets/default-product.png";
+import "./OrderPage.css";
 
 interface Product {
     id?: number;
     name: string;
     imageUrls?: string[];
     price: number;
-    category?: string;
+    category: string;
 }
 
 const OrderPage: React.FC = () => {
@@ -24,18 +25,18 @@ const OrderPage: React.FC = () => {
     const [address, setAddress] = useState("");
     const [quantity, setQuantity] = useState(1);
     const [success, setSuccess] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const res = await getProducts();
-                const found = res.data.find(p => p.id === Number(productId));
+                const found = res.data.find((p: any) => p.id === Number(productId));
 
                 if (found) {
                     setProduct(found);
-
                     if (found.imageUrls && found.imageUrls.length > 0) {
-                        setSelectedImage(found.imageUrls[0]); // ✅ auto select
+                        setSelectedImage(found.imageUrls[0]);
                     }
                 }
             } catch (err) {
@@ -46,11 +47,10 @@ const OrderPage: React.FC = () => {
         fetchProduct();
     }, [productId]);
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         try {
+            setSubmitting(true);
             await createOrder({
                 productId: Number(productId),
                 firstName,
@@ -65,226 +65,227 @@ const OrderPage: React.FC = () => {
         } catch (err) {
             console.error(err);
             alert("Error while placing order");
+        } finally {
+            setSubmitting(false);
         }
     };
 
-    if (!product) return <p>Loading product...</p>;
+    if (!product) {
+        return (
+            <div className="op-page">
+                <div className="op-shell">
+                    <div className="op-loading">
+                        <div className="op-spinner" />
+                        <p>Loading product…</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const total = product.price * quantity;
+
+    const backUrl = product.category
+        ? `/products/${product.category}`
+        : "/listproducts";
+
 
     if (success) {
         return (
-            <div style={styles.container}>
-                <div style={styles.card}>
-                    <h2 style={{ color: "green" }}>✅ Order Placed Successfully!</h2>
-                    <Link to="/listproducts" style={styles.link}>
-                        Back to Products
-                    </Link>
+            <div className="op-page">
+                <div className="op-shell">
+                    <div className="op-success">
+                        <div className="op-successIcon">✅</div>
+                        <h2>Order placed!</h2>
+                        <p>We received your order request and will contact you shortly.</p>
+
+                        <div className="op-successActions">
+                            <Link to="/listproducts" className="op-btn op-btnPrimary">
+                                Back to Products
+                            </Link>
+                            <Link to="/" className="op-btn op-btnGhost">
+                                Home
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div style={styles.container}>
-            <div style={styles.card}>
-                {/* Product Image */}
-                <img
-                    src={selectedImage || DefaultImage}
-                    alt={product.name}
-                    style={styles.productImage}
-                />
-                {/* Image / Color Selection */}
-                <div style={styles.thumbnailRow}>
-                    {product.imageUrls?.map((img, index) => (
-                        <img
-                            key={index}
-                            src={img}
-                            alt={`variant-${index}`}
-                            onClick={() => setSelectedImage(img)}
-                            style={{
-                                ...styles.thumbnail,
-                                border:
-                                    selectedImage === img
-                                        ? "2px solid #4f46e5"
-                                        : "1px solid #ccc",
-                            }}
-                        />
-                    ))}
+        <div className="op-page">
+            <div className="op-shell">
+                <div className="op-card">
+                    {/* Header */}
+                    <div className="op-header">
+                        <div>
+                            <h1 className="op-title">{product.name}</h1>
+                            <p className="op-sub">
+                                <span className="op-price">${product.price.toFixed(2)}</span>
+                                <span className="op-dot">•</span>
+                                <span className="op-muted">Secure checkout</span>
+                            </p>
+                        </div>
+
+                        <Link to={backUrl} className="op-back">
+                            ← Back
+                        </Link>
+                    </div>
+
+                    <div className="op-grid">
+                        {/* Left: image */}
+                        <div className="op-media">
+                            <div className="op-imageWrap">
+                                <img
+                                    src={selectedImage || DefaultImage}
+                                    alt={product.name}
+                                    className="op-productImage"
+                                />
+                            </div>
+
+                            <div className="op-thumbs" aria-label="Choose a variant image">
+                                {product.imageUrls?.map((img, index) => {
+                                    const active = selectedImage === img;
+                                    return (
+                                        <button
+                                            type="button"
+                                            key={index}
+                                            className={`op-thumbBtn ${active ? "active" : ""}`}
+                                            onClick={() => setSelectedImage(img)}
+                                            aria-pressed={active}
+                                        >
+                                            <img src={img} alt={`variant-${index}`} />
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="op-summary">
+                                <div className="op-summaryRow">
+                                    <span className="op-muted">Quantity</span>
+                                    <span className="op-strong">{quantity}</span>
+                                </div>
+                                <div className="op-summaryRow">
+                                    <span className="op-muted">Total</span>
+                                    <span className="op-strong">${total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right: form */}
+                        <form onSubmit={handleSubmit} className="op-form">
+                            <div className="op-fieldRow">
+                                <label className="op-label">
+                                    First name
+                                    <input
+                                        className="op-input"
+                                        type="text"
+                                        placeholder="John"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        required
+                                    />
+                                </label>
+
+                                <label className="op-label">
+                                    Last name
+                                    <input
+                                        className="op-input"
+                                        type="text"
+                                        placeholder="Doe"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        required
+                                    />
+                                </label>
+                            </div>
+
+                            <label className="op-label">
+                                Phone number
+                                <input
+                                    className="op-input"
+                                    type="tel"
+                                    placeholder="+216 …"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    required
+                                />
+                            </label>
+
+                            <label className="op-label">
+                                Email address
+                                <input
+                                    className="op-input"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </label>
+
+                            <label className="op-label">
+                                Delivery address
+                                <textarea
+                                    className="op-input op-textarea"
+                                    placeholder="Street, city, zip…"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    required
+                                />
+                            </label>
+
+                            <label className="op-label">
+                                Quantity
+                                <div className="op-qty">
+                                    <button
+                                        type="button"
+                                        className="op-qtyBtn"
+                                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                                        aria-label="Decrease quantity"
+                                    >
+                                        −
+                                    </button>
+
+                                    <input
+                                        className="op-qtyInput"
+                                        type="number"
+                                        min={1}
+                                        value={quantity}
+                                        onChange={(e) =>
+                                            setQuantity(Math.max(1, Number(e.target.value || 1)))
+                                        }
+                                    />
+
+                                    <button
+                                        type="button"
+                                        className="op-qtyBtn"
+                                        onClick={() => setQuantity((q) => q + 1)}
+                                        aria-label="Increase quantity"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </label>
+
+                            <button
+                                type="submit"
+                                className="op-btn op-btnPrimary op-submit"
+                                disabled={submitting}
+                            >
+                                {submitting ? "Placing order…" : "Confirm Order"}
+                            </button>
+
+                            <p className="op-footnote">
+                                By confirming, you agree to be contacted about your order.
+                            </p>
+                        </form>
+                    </div>
                 </div>
-                <h1 style={styles.title}>{product.name}</h1>
-                <p style={{ textAlign: "center", color: "#555", marginBottom: "20px" }}>
-                    ${product.price.toFixed(2)}
-                </p>
-
-                <form onSubmit={handleSubmit} style={styles.form}>
-
-                    <label style={styles.label}>
-                        First Name
-                        <input
-                            type="text"
-                            placeholder="First name"
-                            value={firstName}
-                            onChange={e => setFirstName(e.target.value)}
-                            required
-                            style={styles.input}
-                        />
-                    </label>
-
-                    <label style={styles.label}>
-                        Last Name
-                        <input
-                            type="text"
-                            placeholder="Last name"
-                            value={lastName}
-                            onChange={e => setLastName(e.target.value)}
-                            required
-                            style={styles.input}
-                        />
-                    </label>
-
-                    <label style={styles.label}>
-                        Phone Number
-                        <input
-                            type="tel"
-                            placeholder="Phone number"
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                            required
-                            style={styles.input}
-                        />
-                    </label>
-
-                    <label style={styles.label}>
-                        Email Address
-                        <input
-                            type="email"
-                            placeholder="Email address"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                            required
-                            style={styles.input}
-                        />
-                    </label>
-
-                    <label style={styles.label}>
-                        Delivery Address
-                        <textarea
-                            placeholder="Delivery address"
-                            value={address}
-                            onChange={e => setAddress(e.target.value)}
-                            required
-                            style={{ ...styles.input, height: "80px", resize: "none" }}
-                        />
-                    </label>
-
-                    <label style={styles.label}>
-                        Quantity
-                        <input
-                            type="number"
-                            min={1}
-                            value={quantity}
-                            onChange={e => setQuantity(Number(e.target.value))}
-                            style={styles.input}
-                        />
-                    </label>
-
-                    <button type="submit" style={styles.button}>
-                        Confirm Order
-                    </button>
-
-                </form>
-
             </div>
         </div>
     );
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-    thumbnailRow: {
-        display: "flex",
-        gap: "10px",
-        justifyContent: "center",
-        marginBottom: "15px",
-    },
-
-    thumbnail: {
-        width: "60px",
-        height: "60px",
-        objectFit: "cover",
-        borderRadius: "6px",
-        cursor: "pointer",
-        backgroundColor: "#f0f0f0",
-    },
-
-    container: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f4f4f9",
-        padding: "20px",
-    },
-    card: {
-        backgroundColor: "#fff",
-        padding: "30px",
-        borderRadius: "12px",
-        boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-        width: "100%",
-        maxWidth: "400px",
-        textAlign: "center",
-    },
-    productImage: {
-        width: "100%",
-        height: "250px",
-        objectFit: "contain",
-        borderRadius: "10px",
-        marginBottom: "15px",
-    },
-    title: {
-        marginBottom: "10px",
-        color: "#333",
-    },
-    form: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "15px",
-    },
-    label: {
-        display: "flex",
-        flexDirection: "column",
-        fontWeight: 500,
-        fontSize: "14px",
-        color: "#555",
-        textAlign: "left",
-    },
-    input: {
-        marginTop: "5px",
-        padding: "10px",
-        borderRadius: "8px",
-        border: "1px solid #ccc",
-        fontSize: "14px",
-        outline: "none",
-        width: "100%",
-        boxSizing: "border-box",
-    },
-    button: {
-        marginTop: "10px",
-        padding: "12px",
-        backgroundColor: "#4f46e5",
-        color: "#fff",
-        border: "none",
-        borderRadius: "8px",
-        fontSize: "16px",
-        cursor: "pointer",
-        transition: "background-color 0.3s",
-    },
-    link: {
-        display: "inline-block",
-        marginTop: "15px",
-        color: "#4f46e5",
-        textDecoration: "none",
-        fontWeight: 500,
-    },
-    
 };
 
 export default OrderPage;
