@@ -167,12 +167,12 @@ const ProductDetailsPage: React.FC = () => {
   }
 
 
-  const isOutOfStock = product.stockStatus === StockStatus.OUT_OF_STOCK;
-  const isInStock = product.stockStatus === StockStatus.IN_STOCK;
-  const badgeText = isInStock ? "In Stock" : "Out of Stock";
+  //const isOutOfStock = product.stockStatus === StockStatus.OUT_OF_STOCK;
+  //const isInStock = product.stockStatus === StockStatus.IN_STOCK;
+  //const badgeText = isInStock ? "In Stock" : "Out of Stock";
 
-  const mainIsVideo = selectedMedia?.type === "video";
-  const mainUrl = selectedMedia?.url;
+ // const mainIsVideo = selectedMedia?.type === "video";
+//  const mainUrl = selectedMedia?.url;
 
   return (
     <div className="op-page">

@@ -15,7 +15,7 @@ const NavBar: React.FC = () => {
     const [phone, setPhone] = useState<string | null>(localStorage.getItem("phone"));
     const [inputPhone, setInputPhone] = useState<string>("");
 
-    const isConnected = !!phone; // true if phone exists
+    //const isConnected = !!phone; // true if phone exists
 
     const handleCartClick = () => {
         let storedPhone = phone;
@@ -32,11 +32,11 @@ const NavBar: React.FC = () => {
         navigate(`/cart/${storedPhone}`);
     };
 
-    const handleSignOut = () => {
-        localStorage.removeItem("phone");
-        setPhone(null);
-        setCartCount(0); // optional: clear cart count when signing out
-    };
+    //const handleSignOut = () => {
+      //  localStorage.removeItem("phone");
+        //setPhone(null);
+        //setCartCount(0); // optional: clear cart count when signing out
+    //};
 
     const loadCart = (phone: string) => {
         getCart(phone)
