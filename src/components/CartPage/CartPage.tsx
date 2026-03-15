@@ -259,7 +259,7 @@ const CartPage: React.FC = () => {
                                     <input
                                         className="op-input"
                                         type="text"
-                                        placeholder="John"
+                                        //placeholder="John"
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
                                         required
@@ -271,7 +271,7 @@ const CartPage: React.FC = () => {
                                     <input
                                         className="op-input"
                                         type="text"
-                                        placeholder="Doe"
+                                        //placeholder="Doe"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
                                         required
@@ -286,7 +286,7 @@ const CartPage: React.FC = () => {
                                 <input
                                     className="op-input"
                                     type="email"
-                                    placeholder="you@example.com"
+                                    placeholder="name@example.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
@@ -297,7 +297,7 @@ const CartPage: React.FC = () => {
                                 Delivery address
                                 <textarea
                                     className="op-input op-textarea"
-                                    placeholder="Street, city, zip…"
+                                    placeholder="Street, city…"
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
                                     required
