@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import "../OrderPage/OrderPage.css";
 import DefaultImage from "../../assets/default-product.png";
-import { getCart, removeCartItem } from "../../services/cartService";
+import { getCart, removeCartItem, updateCartItem } from "../../services/cartService";
 import { useNavigate } from "react-router-dom";
 import { checkoutCart } from "../../services/orderService";
 
@@ -10,6 +10,7 @@ import { checkoutCart } from "../../services/orderService";
 type CartItem = {
     id: number;
     quantity: number;
+    selectedImage?: string;
     product: {
         id: number;
         name: string;
@@ -137,24 +138,108 @@ const CartPage: React.FC = () => {
                             {cart.items.map((item) => (
                                 <div key={item.id} className="op-imageWrap">
                                     <img
-                                        src={item.product.imageUrls?.[0] || DefaultImage}
+                                        src={item.selectedImage || item.product.imageUrls?.[0] || DefaultImage}
                                         className="op-productImage"
                                         style={{ height: 180 }}
                                     />
+
+                                    <div className="op-thumbs">
+                                        {item.product.imageUrls?.map((img) => (
+                                            <button
+                                                key={img}
+                                                className={`op-thumbBtn ${item.selectedImage === img ? "active" : ""}`}
+                                                onClick={async () => {
+                                                    await updateCartItem(item.id, item.quantity, img);
+                                                    setCart((prev) =>
+                                                        prev
+                                                            ? {
+                                                                ...prev,
+                                                                items: prev.items.map((i) =>
+                                                                    i.id === item.id ? { ...i, selectedImage: img } : i
+                                                                ),
+                                                            }
+                                                            : prev
+                                                    );
+                                                }}
+                                            >
+                                                <img src={img} />
+                                            </button>
+                                        ))}
+                                    </div>
 
                                     <div className="op-summary">
                                         <div className="op-summaryRow">
                                             <strong>{item.product.name}</strong>
                                         </div>
+
+                                        {/* Quantity controls */}
                                         <div className="op-summaryRow">
                                             <span>Quantity</span>
-                                            <span>{item.quantity}</span>
+                                            <div className="op-qty">
+                                                <button
+                                                    className="op-qtyBtn"
+                                                    onClick={async () => {
+                                                        const newQty = Math.max(1, item.quantity - 1);
+                                                        await updateCartItem(item.id, newQty, item.selectedImage || "");
+                                                        setCart((prev) =>
+                                                            prev
+                                                                ? {
+                                                                    ...prev,
+                                                                    items: prev.items.map((i) =>
+                                                                        i.id === item.id ? { ...i, quantity: newQty } : i
+                                                                    ),
+                                                                }
+                                                                : prev
+                                                        );
+                                                    }}
+                                                >
+                                                    −
+                                                </button>
+                                                <input
+                                                    className="op-qtyInput"
+                                                    type="number"
+                                                    min={1}
+                                                    value={item.quantity}
+                                                    onChange={async (e) => {
+                                                        const newQty = Math.max(1, Number(e.target.value || 1));
+                                                        await updateCartItem(item.id, newQty, item.selectedImage || "");
+                                                        setCart((prev) =>
+                                                            prev
+                                                                ? {
+                                                                    ...prev,
+                                                                    items: prev.items.map((i) =>
+                                                                        i.id === item.id ? { ...i, quantity: newQty } : i
+                                                                    ),
+                                                                }
+                                                                : prev
+                                                        );
+                                                    }}
+                                                />
+                                                <button
+                                                    className="op-qtyBtn"
+                                                    onClick={async () => {
+                                                        const newQty = item.quantity + 1;
+                                                        await updateCartItem(item.id, newQty, item.selectedImage || "");
+                                                        setCart((prev) =>
+                                                            prev
+                                                                ? {
+                                                                    ...prev,
+                                                                    items: prev.items.map((i) =>
+                                                                        i.id === item.id ? { ...i, quantity: newQty } : i
+                                                                    ),
+                                                                }
+                                                                : prev
+                                                        );
+                                                    }}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
                                         </div>
+
                                         <div className="op-summaryRow">
                                             <span>Subtotal</span>
-                                            <span>
-                                                ${(item.product.price * item.quantity).toFixed(2)}
-                                            </span>
+                                            <span>${(item.product.price * item.quantity).toFixed(2)}</span>
                                         </div>
 
                                         <button
@@ -168,26 +253,56 @@ const CartPage: React.FC = () => {
                             ))}
                         </div>
                         <div className="op-form">
-                            <input
-                                placeholder="First name"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                            />
-                            <input
-                                placeholder="Last name"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                            />
-                            <input
-                                placeholder="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                            <input
-                                placeholder="Address"
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                            />
+                            <div className="op-fieldRow">
+                                <label className="op-label">
+                                    First name
+                                    <input
+                                        className="op-input"
+                                        type="text"
+                                        placeholder="John"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        required
+                                    />
+                                </label>
+
+                                <label className="op-label">
+                                    Last name
+                                    <input
+                                        className="op-input"
+                                        type="text"
+                                        placeholder="Doe"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        required
+                                    />
+                                </label>
+                            </div>
+
+                            
+
+                            <label className="op-label">
+                                Email address
+                                <input
+                                    className="op-input"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </label>
+
+                            <label className="op-label">
+                                Delivery address
+                                <textarea
+                                    className="op-input op-textarea"
+                                    placeholder="Street, city, zip…"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    required
+                                />
+                            </label>
                         </div>
 
 

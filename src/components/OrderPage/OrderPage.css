@@ -184,6 +184,9 @@
     border-radius: 18px;
     padding: 16px;
     background: rgba(17, 24, 39, 0.015);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
 .op-label {
@@ -199,7 +202,7 @@
 .op-fieldRow {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 18px;
 }
 
 @media (min-width: 520px) {
@@ -217,6 +220,7 @@
     font-size: 14px;
     outline: none;
     transition: box-shadow 0.15s ease, border 0.15s ease, transform 0.15s ease;
+    box-sizing: border-box;
 }
 
 .op-input:focus {

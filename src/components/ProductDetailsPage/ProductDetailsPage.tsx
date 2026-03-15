@@ -72,6 +72,12 @@ const ProductDetailsPage: React.FC = () => {
   const handleOrderNow = async () => {
     if (!product?.id) return;
 
+    // validate fields manually
+    if (!firstName || !lastName || !phone || !email || !address) {
+      alert("Please fill all required fields");
+      return;
+    }
+
     try {
       setSubmitting(true);
 
@@ -86,7 +92,7 @@ const ProductDetailsPage: React.FC = () => {
         selectedImage: selectedMedia?.url || "",
       });
 
-      navigate("/"); // or success page
+      navigate("/"); // success page
     } catch (e) {
       alert("Failed to place order");
     } finally {
@@ -97,16 +103,27 @@ const ProductDetailsPage: React.FC = () => {
   const handleAddToCart = async () => {
     if (!product?.id) return;
 
-    const phoneValue = phone || prompt("Enter your phone number");
-    if (!phoneValue) return;
+    // Check if user is connected
+    let phoneValue = localStorage.getItem("phone"); // get connected phone
+    if (!phoneValue) {
+      // fallback to prompt if not connected
+      phoneValue = phone || prompt("Enter your phone number");
+      if (!phoneValue) return;
+    }
 
-    await addToCart({
-      phone: phoneValue,
-      productId: product.id,
-      quantity,
-    });
+    try {
+      await addToCart({
+        phone: phoneValue,
+        productId: product.id,
+        quantity,
+        selectedImage: selectedMedia?.url || product.imageUrls?.[0] || "",
+      });
 
-    alert("Added to cart");
+      alert("Added to cart");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add to cart");
+    }
   };
 
 
