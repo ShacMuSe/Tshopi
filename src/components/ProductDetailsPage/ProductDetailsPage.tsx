@@ -5,7 +5,7 @@ import "../OrderPage/OrderPage.css";
 
 import type { Product } from "../../types/Product";
 import { getProducts } from "../../services/productService";
-import { StockStatus } from "../enums/StockStatus";
+//import { StockStatus } from "../enums/StockStatus";
 import { addToCart } from "../../services/cartService";
 import { createOrder } from "../../services/orderService";
 
