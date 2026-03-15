@@ -239,7 +239,7 @@ const CartPage: React.FC = () => {
 
                                         <div className="op-summaryRow">
                                             <span>Subtotal</span>
-                                            <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                                            <span>{(item.product.price * item.quantity).toFixed(2)} dt</span>
                                         </div>
 
                                         <button
@@ -311,7 +311,7 @@ const CartPage: React.FC = () => {
                             <div className="op-summary">
                                 <div className="op-summaryRow">
                                     <span>Total</span>
-                                    <span className="op-strong">${total.toFixed(2)}</span>
+                                    <span className="op-strong">{total.toFixed(2)} dt</span>
                                 </div>
                             </div>
 

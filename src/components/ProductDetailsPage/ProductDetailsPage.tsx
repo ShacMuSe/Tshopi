@@ -184,7 +184,7 @@ const ProductDetailsPage: React.FC = () => {
             <div>
               <h1 className="op-title">{product.name}</h1>
               <p className="op-sub">
-                <span className="op-price">${product.price.toFixed(2)}</span>
+                <span className="op-price">{product.price.toFixed(2)} dt</span>
                 <span className="op-dot">•</span>
                 <span className="op-muted">Secure checkout</span>
               </p>
@@ -225,7 +225,7 @@ const ProductDetailsPage: React.FC = () => {
                 </div>
                 <div className="op-summaryRow">
                   <span>Total</span>
-                  <span>${(product.price * quantity).toFixed(2)}</span>
+                  <span>{(product.price * quantity).toFixed(2)} dt</span>
                 </div>
               </div>
             </div>
@@ -264,7 +264,7 @@ const ProductDetailsPage: React.FC = () => {
                 <input
                   className="op-input"
                   type="tel"
-                  placeholder="+216 …"
+                  //placeholder="+216 …"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required

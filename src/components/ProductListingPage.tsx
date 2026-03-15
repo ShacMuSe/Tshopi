@@ -84,7 +84,7 @@ const ProductListingPage: React.FC = () => {
                             <h3 style={{ fontSize: "1.1rem", marginBottom: "5px" }}>
                                 {p.name}
                             </h3>
-                            <p style={{ fontWeight: "bold", color: "#333" }}>${p.price}</p>
+                            <p style={{ fontWeight: "bold", color: "#333" }}>{p.price} dt</p>
                         </div>
                     </Link>
                 ))}
